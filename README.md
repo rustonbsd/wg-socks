@@ -2,7 +2,6 @@
 
 [![crates.io](https://img.shields.io/crates/v/wg-socks.svg)](https://crates.io/crates/wg-socks)
 [![docs.rs](https://img.shields.io/docsrs/wg-socks)](https://docs.rs/wg-socks)
-[![build](https://github.com/rustonbsd/wg-socks/actions/workflows/ci.yml/badge.svg)](https://github.com/rustonbsd/wg-socks/actions/workflows/ci.yml)
 
 Turn a WireGuard config into a local SOCKS5 proxy.
 
