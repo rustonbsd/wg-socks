@@ -1,10 +1,7 @@
 pub mod config;
 
 use anyhow::{Context, Result};
-use fast_socks5::{
-    ReplyError, Socks5Command,
-    server::{DnsResolveHelper, Socks5ServerProtocol},
-};
+use fast_socks5::{ReplyError, Socks5Command, server::Socks5ServerProtocol};
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
 use tracing::{debug, error, info, warn};
@@ -106,9 +103,6 @@ async fn handle_client(
         .await
         .map_err(|e| anyhow::anyhow!("{}", e))?
         .read_command()
-        .await
-        .map_err(|e| anyhow::anyhow!("{}", e))?
-        .resolve_dns()
         .await
         .map_err(|e| anyhow::anyhow!("{}", e))?;
 

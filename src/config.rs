@@ -20,18 +20,18 @@ impl WgConfig {
     /// ```text
     /// [Interface]
     /// PrivateKey = ...
-    /// Address = 10.0.0.2/32
+    /// Address = 10.0.0.2/32,fd00::2/128
     /// DNS = 1.1.1.1
     ///
     /// [Peer]
     /// PublicKey = ...
     /// Endpoint = 1.2.3.4:51820
-    /// AllowedIPs = 0.0.0.0/0
+    /// AllowedIPs = 0.0.0.0/0,::/0
     /// PersistentKeepalive = 25
     /// ```
     pub fn from_string(config: &str) -> Result<Self> {
         let mut private_key = None;
-        let mut address = None;
+        let mut addresses = Vec::new();
         let mut dns = None;
         let mut peer_public_key = None;
         let mut peer_endpoint = None;
@@ -65,7 +65,13 @@ impl WgConfig {
                             private_key = Some(decode_key(value)?);
                         }
                         "Address" => {
-                            address = Some(value.to_string());
+                            addresses.extend(
+                                value
+                                    .split(',')
+                                    .map(str::trim)
+                                    .filter(|s| !s.is_empty())
+                                    .map(ToOwned::to_owned),
+                            );
                         }
                         "DNS" => {
                             dns = Some(value.to_string());
@@ -82,8 +88,13 @@ impl WgConfig {
                                 Some(value.parse::<SocketAddr>().context("invalid endpoint")?);
                         }
                         "AllowedIPs" => {
-                            peer_allowed_ips =
-                                value.split(',').map(|s| s.trim().to_string()).collect();
+                            peer_allowed_ips.extend(
+                                value
+                                    .split(',')
+                                    .map(str::trim)
+                                    .filter(|s| !s.is_empty())
+                                    .map(ToOwned::to_owned),
+                            );
                         }
                         "PresharedKey" => {
                             peer_preshared_key = Some(decode_key(value)?);
@@ -99,7 +110,9 @@ impl WgConfig {
 
         Ok(WgConfig {
             private_key: private_key.context("missing PrivateKey")?,
-            address: address.context("missing Address")?,
+            address: (!addresses.is_empty())
+                .then(|| addresses.join(","))
+                .context("missing Address")?,
             dns,
             peer_public_key: peer_public_key.context("missing peer PublicKey")?,
             peer_endpoint: peer_endpoint.context("missing peer Endpoint")?,
