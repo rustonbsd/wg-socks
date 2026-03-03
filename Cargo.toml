@@ -1,0 +1,21 @@
+[package]
+name = "wg-socks"
+description = "socks5 server (lib) from wireguard config"
+license = "Apache-2.0"
+authors = ["Zacharias Boehler <rustonbsd@mailfence.com>"]
+repository = "https://github.com/rustonbsd/wg-socks"
+readme = "README.md"
+keywords = ["networking"]
+categories = ["network-programming"]
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+fast-socks5 = "^1"
+tokio-wireguard = "^0.1"
+tokio = { version = "^1", features = ["net", "sync", "io-util", "rt-multi-thread", "macros"] }
+reqwest = { version = "^0.13", features = ["socks"] }
+tokio-stream = "^0.1"
+anyhow = "^1"
+tracing = "^0.1"
+base64 = "^0.22"
